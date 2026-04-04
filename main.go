@@ -9,11 +9,18 @@ import (
 )
 
 func main() {
+	http.HandleFunc("/health", healthHandler)
 	http.HandleFunc("/", proxyHandler)
 	
 	port := "8081"
 	log.Printf("YouTube Stream Proxy starting on port %s", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
+}
+
+func healthHandler (w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(`{"status":"ok"}`))
 }
 
 func proxyHandler(w http.ResponseWriter, r *http.Request) {
