@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"io"
 	"log"
 	"net/http"
@@ -9,10 +10,15 @@ import (
 )
 
 func main() {
+	port := os.Getenv("PROXY_PORT")
+	
+	if port == "" {
+		port = "4848"
+	}
+
 	http.HandleFunc("/health", healthHandler)
 	http.HandleFunc("/", proxyHandler)
-	
-	port := "8081"
+
 	log.Printf("YouTube Stream Proxy starting on port %s", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
