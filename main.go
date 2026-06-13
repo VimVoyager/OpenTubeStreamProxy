@@ -78,6 +78,11 @@ func proxyHandler(w http.ResponseWriter, r *http.Request) {
 	req.Header.Set("Accept-Language", "en-US,en;q=0.9")
 	req.Header.Set("Referer", "https://www.youtube.com/")
 	req.Header.Set("Origin", "https://www.youtube.com")
+
+	// Convert range query param back to a range back to a Range header for YouTube
+	if rangeVal := r.URL.Query().Get("range"); rangeVal != "" {
+		req.Header.Set("Range", "bytes="+rangeVal)
+	}
 	
 	// Make the request
 	client := &http.Client{
@@ -95,6 +100,9 @@ func proxyHandler(w http.ResponseWriter, r *http.Request) {
 	
 	// Copy response headers to client
 	for key, values := range resp.Header {
+		if strings.ToLower (key) == "access-control-allow-origin" {
+			continue
+		}
 		for _, value := range values {
 			w.Header().Add(key, value)
 		}
@@ -128,7 +136,7 @@ func buildYouTubeURL(host string, requestURL *url.URL) string {
 	// Copy all query parameters except 'host'
 	query := url.Values{}
 	for key, values := range requestURL.Query() {
-		if key != "host" {
+		if key != "host" && key != "range"{
 			for _, value := range values {
 				query.Add(key, value)
 			}
