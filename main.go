@@ -9,6 +9,8 @@ import (
 	"strings"
 )
 
+var version = "dev"
+
 func main() {
 	port := os.Getenv("PROXY_PORT")
 	
